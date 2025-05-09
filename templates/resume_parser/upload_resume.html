@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Resume{% endblock %}
+
+{% block content %}
+<h2>Upload Your Resume</h2>
+<form action="{% url 'upload_resume' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="resume">Upload Your Resume (PDF):</label>
+    <input type="file" name="resume" id="resume" accept=".pdf">
+    <button type="submit">Upload</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,138 @@
+  {% extends 'base.html' %}
+
+  {% load static %} 
+
+  {% block title %}My Resume Dashboard{% endblock %}
+
+  {% block content %}
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-semibold">Welcome, {{ user.first_name }}</h2>
+      <form action="{% url 'upload_resume' %}" method="POST" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+          {% csrf_token %}
+          <input type="file" name="resume" accept=".pdf" class="form-control form-control-sm" required>
+          <button type="submit" class="btn btn-primary d-flex align-items-center" id="upload_resume_button">
+            <!-- Add your PNG icon here -->
+            <img src="{% static 'upload.png' %}" alt="Upload Icon" class="me-2" style="width: 20px; height: 20px;">
+            Upload Resume
+        </button>
+      </form>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if resume %}
+      <div class="card p-3 mb-4 shadow-sm">
+        <h5 class="text-primary mb-3">Uploaded Resume Preview</h5>
+        {{ pdf_preview|safe }}
+      </div>
+
+      <form action="{% url 'save_resume' resume.id %}" method="POST" class="row g-4">
+        {% csrf_token %}
+
+        <!-- Personal Info Section -->
+        <div class="card p-4 shadow-sm">
+          <h5 class="mb-3 text-primary">Personal Info</h5>
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Full Name</label><input type="text" name="name" value="{{ resume.parsed_data.name }}" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Email</label><input type="email" name="email" value="{{ resume.parsed_data.contact.email }}" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">Phone</label><input type="text" name="phone" value="{{ resume.parsed_data.contact.phone }}" class="form-control"></div>
+            
+            <div class="col-md-6">
+              <label class="form-label">LinkedIn</label>
+              <input type="text" name="linkedin" value="{{ resume.parsed_data.contact.linkedin }}" class="form-control" placeholder="https://www.linkedin.com/in/ankit-kumar/">
+            </div>
+            
+            <div class="col-md-6">
+              <label class="form-label">GitHub</label>
+              <input type="text" name="github" value="{{ resume.parsed_data.contact.github }}" class="form-control" placeholder="https://github.com/ankitkumar">
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="card p-4 shadow-sm">
+          <h5 class="mb-3 text-primary">Summary</h5>
+          <textarea name="summary" rows="3" class="form-control">{{ resume.parsed_data.summary }}</textarea>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="card p-4 shadow-sm">
+          <h5 class="mb-3 text-primary">Skills</h5>
+          <div class="row g-2">
+            {% for skill in resume.parsed_data.skills %}
+              <div class="col-md-6"><input type="text" name="skills" value="{{ skill }}" class="form-control mb-2" placeholder="Skill" readonly></div>
+            {% endfor %}
+          </div>
+          <input type="text" name="skills" value="{{ resume.parsed_data.skills|join:', ' }}" class="form-control" placeholder="Add New Skills (comma separated)">
+        </div>
+
+        <!-- Experience Section -->
+        <div class="card p-4 shadow-sm">
+          <h5 class="mb-3 text-primary">Experience</h5>
+          {% for exp in resume.parsed_data.experience %}
+            <div class="row g-3 mb-2">
+              <div class="col-md-4"><input type="text" name="experience_title" value="{{ exp.job_title }}" class="form-control" placeholder="Job Title"></div>
+              <div class="col-md-4"><input type="text" name="experience_company" value="{{ exp.company }}" class="form-control" placeholder="Company"></div>
+              <div class="col-md-4"><input type="text" name="experience_duration" value="{{ exp.duration }}" class="form-control" placeholder="Duration"></div>
+              <div class="col-md-12"><textarea name="experience_description" rows="2" class="form-control" placeholder="Job Description">{{ exp.description }}</textarea></div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Education Section -->
+        <div class="card p-4 shadow-sm">
+          <h5 class="mb-3 text-primary">Education</h5>
+          {% for edu in resume.parsed_data.education %}
+          <div class="row g-3 mb-2">
+              <div class="col-md-4"><input type="text" name="degree" value="{{ edu.degree }}" class="form-control" placeholder="Degree"></div>
+              <div class="col-md-5"><input type="text" name="institution" value="{{ edu.institution }}" class="form-control" placeholder="Institution"></div>
+              <div class="col-md-3"><input type="text" name="year" value="{{ edu.year }}" class="form-control" placeholder="Year"></div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Projects Section -->
+        <div class="card p-4 shadow-sm">
+          <h5 class="mb-3 text-primary">Projects</h5>
+          {% for project in resume.parsed_data.projects %}
+          <div class="mb-3">
+            <input type="text" name="project_name" value="{{ project.name }}" class="form-control mb-2" placeholder="Project Name">
+            <textarea name="project_description" rows="2" class="form-control" placeholder="Description">{{ project.description }}</textarea>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Certifications Section -->
+        {% if resume.parsed_data.certifications %}
+        <div class="card p-4 shadow-sm">
+          <h5 class="mb-3 text-primary">Certifications</h5>
+          <input type="text" name="certifications" value="{{ resume.parsed_data.certifications|join:', ' }}" class="form-control">
+        </div>
+        {% endif %}
+
+        <!-- Languages Section -->
+        {% if resume.parsed_data.languages %}
+        <div class="card p-4 shadow-sm">
+          <h5 class="mb-3 text-primary">Languages</h5>
+          <input type="text" name="languages" value="{{ resume.parsed_data.languages|join:', ' }}" class="form-control">
+        </div>
+        {% endif %}
+
+        <div class="col-12 text-center mt-3 mb-2">
+          <button type="submit" class="btn btn-success px-4">💾 Save Changes</button>
+      </div>
+      </form>
+
+    {% else %}
+      <p class="text-muted">No resume uploaded yet. Upload one above to get started.</p>
+    {% endif %}
+  </div>
+  {% endblock %}

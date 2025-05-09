@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply to Job{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Apply to Job</h2>
+    <form method="POST" action="{% url 'apply_to_job' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="job_url" class="form-label">Job Application URL</label>
+            <input type="url" name="job_url" class="form-control" placeholder="Enter the job application URL" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">LinkedIn Email</label>
+            <input type="email" name="email" class="form-control" placeholder="Enter your LinkedIn email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">LinkedIn Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Enter your LinkedIn password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Apply</button>
+    </form>
+</div>
+{% endblock %}
