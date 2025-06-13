@@ -38,7 +38,7 @@ job_application_automator/
 Clone this repository:
 
 ```bash
-git clone <your-github-repo-url>
+git clone https://github.com/ankit1khare/Job-Application-Automator.git
 cd job_application_automator
 ```
 
@@ -59,7 +59,7 @@ Set environment variables:
 
 ```bash
 export OPENAI_API_KEY="your_openai_api_key"
-export LANDING_AI_API_KEY="your_landingai_api_key"
+export VISION_AGENT_API_KEY="your_landingai_api_key"
 export LINKEDIN_EMAIL="your_linkedin_email"
 export LINKEDIN_PASSWORD="your_linkedin_password"
 ```
